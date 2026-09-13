@@ -28,33 +28,100 @@ cancion2.volume = 0.55;
 
 
 /* =========================================================
+   INICIAR MÚSICA CON CUALQUIER INTERACCIÓN
+   PC + CELULAR
+========================================================= */
+
+let musicaIniciada = false;
+
+function activarMusica() {
+
+    if (musicaIniciada) {
+        return;
+    }
+
+    musicaIniciada = true;
+
+    cancion1.load();
+
+    cancion1.play()
+        .then(function () {
+
+            console.log("🎵 Canción 1 iniciada");
+
+        })
+        .catch(function (error) {
+
+            musicaIniciada = false;
+
+            console.log(
+                "No se pudo reproducir la canción:",
+                error
+            );
+
+        });
+}
+
+
+/* =========================================================
+   PC
+========================================================= */
+
+document.addEventListener(
+    "pointerdown",
+    activarMusica,
+    {
+        once: true,
+        capture: true
+    }
+);
+
+
+/* =========================================================
+   CELULAR
+========================================================= */
+
+document.addEventListener(
+    "touchstart",
+    activarMusica,
+    {
+        once: true,
+        capture: true,
+        passive: true
+    }
+);
+
+
+/* =========================================================
    ENTRAR A LA SEGUNDA PANTALLA
 ========================================================= */
 
 entrar.addEventListener("click", function () {
 
-    /* detener canción 1 */
+    /* Detener canción 1 */
 
     cancion1.pause();
     cancion1.currentTime = 0;
 
-    /* preparar canción 2 */
+
+    /* Preparar canción 2 */
 
     cancion2.currentTime = 0;
 
-    /* animación de salida */
+
+    /* Animación de salida */
 
     inicio.classList.add("salida");
 
 
     setTimeout(function () {
 
-        /* ocultar inicio */
+        /* Ocultar inicio */
 
         inicio.classList.add("oculto");
 
 
-        /* mostrar segunda pantalla */
+        /* Mostrar segunda pantalla */
 
         principal.classList.remove("oculto");
 
@@ -63,18 +130,25 @@ entrar.addEventListener("click", function () {
         principal.classList.add("entrada");
 
 
-        /* reproducir segunda canción */
+        /* Reproducir canción 2 */
 
-        cancion2.play().catch(function () {
+        cancion2.play()
+            .then(function () {
 
-            console.log(
-                "El navegador necesita interacción para reproducir el audio."
-            );
+                console.log("🎵 Canción 2 iniciada");
 
-        });
+            })
+            .catch(function (error) {
+
+                console.log(
+                    "No se pudo reproducir la canción 2:",
+                    error
+                );
+
+            });
 
 
-        /* crear partículas */
+        /* Crear partículas */
 
         crearParticulas();
 
@@ -89,26 +163,26 @@ entrar.addEventListener("click", function () {
 
 volver.addEventListener("click", function () {
 
-    /* detener canción 2 */
+    /* Detener canción 2 */
 
     cancion2.pause();
 
     cancion2.currentTime = 0;
 
 
-    /* preparar canción 1 */
+    /* Preparar canción 1 */
 
     cancion1.currentTime = 0;
 
 
-    /* animación de salida */
+    /* Animación de salida */
 
     principal.classList.add("salida");
 
 
     setTimeout(function () {
 
-        /* ocultar segunda pantalla */
+        /* Ocultar segunda pantalla */
 
         principal.classList.add("oculto");
 
@@ -117,7 +191,7 @@ volver.addEventListener("click", function () {
         principal.classList.remove("salida");
 
 
-        /* mostrar inicio */
+        /* Mostrar inicio */
 
         inicio.classList.remove("oculto");
 
@@ -126,15 +200,22 @@ volver.addEventListener("click", function () {
         inicio.classList.add("entrada-inicio");
 
 
-        /* reproducir primera canción */
+        /* Reproducir canción 1 */
 
-        cancion1.play().catch(function () {
+        cancion1.play()
+            .then(function () {
 
-            console.log(
-                "Autoplay bloqueado por el navegador."
-            );
+                console.log("🎵 Canción 1 reiniciada");
 
-        });
+            })
+            .catch(function (error) {
+
+                console.log(
+                    "No se pudo reproducir la canción 1:",
+                    error
+                );
+
+            });
 
     }, 650);
 
@@ -267,23 +348,11 @@ function crearParticulas() {
 
 
 /* =========================================================
-   AUTOPLAY
+   CARGAR PÁGINA
 ========================================================= */
 
 window.addEventListener("load", function () {
 
-    /* Crear partículas desde el inicio */
     crearParticulas();
-
-
-    /* Intentar reproducir la primera canción */
-
-    cancion1.play().catch(function () {
-
-        console.log(
-            "Autoplay bloqueado por el navegador."
-        );
-
-    });
 
 });
