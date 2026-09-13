@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Heart Love</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  animation: fadeIn 2s ease-in-out;
+  perspective: 1000px; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* pantalla inicial */
+.start {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 10;
+  will-change: opacity, transform, filter;
+
+}
+
+/* rosa animada */
+.rose {
+  font-size: 55px;
+  margin-bottom: 20px;
+  animation: floatRose 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px red);
+}
+
+@keyframes floatRose {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* texto de intriga */
+.intro {
+  margin-bottom: 20px;
+  color: #ffb3d9;
+  font-size: 20px;
+  font-family: Arial;
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* botón con pulso */
+.start button {
+  padding: 15px 30px;
+  font-size: 20px;
+  background: #ff4d6d;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px #ff4d6d;
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 25px #ff4d6d;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px #ff4d6d;
+  }
+}
+
+/* contenedor con latido */
+.container {
+  position: relative;
+  width: 800px;
+  height: 800px;
+  animation: beat 3s ease-in-out infinite;
+  z-index: 1;
+  filter: drop-shadow(0 0 10px pink);
+  transform-style: preserve-3d;
+}
+
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* mensaje */
+.mensaje {
+  position: absolute;
+  color: white;
+  font-size: 42px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  text-align: center;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  text-shadow: 0 0 20px pink, 0 0 40px hotpink;
+  z-index: 2;
+}
+
+/* textos corazón */
+.ui_love_word {
+  position: absolute;
+  font-size: 22px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+
+  white-space: nowrap;
+  transform: translate(-50%, -50%) translateZ(10px); 
+  opacity: 0;
+  animation: flow 6s linear infinite, colorShift 3s infinite alternate;
+}
+
+@keyframes colorShift {
+  0% { color: #ff4d6d; text-shadow: 0 0 10px #ff4d6d; }
+  50% { color: #ff99cc; text-shadow: 0 0 20px #ff99cc; }
+  100% { color: #ff1493; text-shadow: 0 0 25px #ff1493; }
+}
+
+@keyframes flow {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* fondo */
+#bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  filter: blur(1px);
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- pantalla inicial -->
+<div id="start" class="start">
+  
+  <div class="rose">🌹</div>
+
+  <div class="intro">
+    <p>Fecha cumple</p>
+  </div>
+
+  <button onclick="startExperience()">Open ✨</button>
+</div>  
+
+<canvas id="bg"></canvas>
+
+<h1 class="mensaje">❤️</h1>
+
+<audio id="music" loop>
+  <source src="LoveUProyect.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container">
+  <div id="heart"></div>
+</div>
+
+<script>
+// iniciar experiencia
+function startExperience() {
+  const start = document.getElementById("start");
+
+  // transición PRO
+  start.style.transition = "opacity 1.2s ease, transform 1.2s ease, filter 1.2s ease";
+
+  start.style.opacity = "0";
+  start.style.transform = "scale(1.1)";
+  start.style.filter = "blur(10px)";
+
+  setTimeout(() => {
+    start.style.display = "none";
+  }, 1200);
+
+  // música
+  const audio = document.getElementById("music");
+  audio.volume = 0;
+  audio.play();
+
+  let vol = 0;
+  let fade = setInterval(() => {
+    if (vol < 0.5) {
+      vol += 0.02;
+      audio.volume = vol;
+    } else clearInterval(fade);
+  }, 100);
+} 
+// corazón
+const heart = document.getElementById("heart");
+
+let points = [];
+
+for (let t = 0; t < Math.PI * 2; t += 0.1) {
+  let x = 16 * Math.pow(Math.sin(t), 3);
+  let y = 13 * Math.cos(t)
+          - 5 * Math.cos(2*t)
+          - 2 * Math.cos(3*t)
+          - Math.cos(4*t);
+
+  points.push({x, y});
+}
+
+points.forEach((p, index) => {
+  let el = document.createElement("div");
+  el.className = "ui_love_word";
+  el.innerText = "I love you";
+
+  el.style.left = (400 + p.x * 20) + "px";
+  el.style.top = (400 - p.y * 20) + "px";
+
+  el.style.animationDelay = (index * 0.03) + "s";
+
+  heart.appendChild(el);
+});
+
+// partículas
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+const symbols = ["✨", "💜"];
+
+for (let i = 0; i < 40; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 8 + 10,
+    speed: 0.2 + Math.random() * 0.4,
+    symbol: symbols[Math.floor(Math.random() * symbols.length)]
+  });
+}
+
+let lastTime = 0;
+const fps = 30;
+const interval = 1000 / fps;
+
+function animate(time = 0) {
+  if (time - lastTime < interval) {
+    requestAnimationFrame(animate);
+    return;
+  }
+
+  lastTime = time;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    ctx.font = p.size + "px Arial";
+    ctx.fillText(p.symbol, p.x, p.y);
+
+    p.y -= p.speed;
+    p.x += Math.sin(p.y * 0.01);
+
+    if (p.y < 0) {
+      p.y = canvas.height;
+      p.x = Math.random() * canvas.width;
+    }
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+// 3D movimiento
+document.addEventListener("mousemove", e => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 20;
+  const y = (e.clientY / window.innerHeight - 0.5) * 20;
+
+  heart.style.transform = `
+    rotateY(${x}deg)
+    rotateX(${-y}deg)
+    translateZ(20px)
+  `;
+});
+</script>
+
+</body>
+</html>
