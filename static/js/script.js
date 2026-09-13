@@ -29,29 +29,22 @@ cancion2.volume = 0.55;
 
 
 /* =========================================================
-   ESTADO DE LA MÚSICA
+   ESTADO
 ========================================================= */
 
 let musicaIniciada = false;
 
 
 /* =========================================================
-   INICIAR CANCIÓN 1
+   CANCIÓN 1
 ========================================================= */
 
 function iniciarCancion1() {
 
-    /* Si ya está sonando, no hacemos nada */
-
-    if (!cancion1.paused) {
-        musicaIniciada = true;
-        return;
-    }
-
-
-    /* Asegurarnos de que la canción 2 esté apagada */
+    /* Asegurar que canción 2 esté apagada */
 
     cancion2.pause();
+    cancion2.currentTime = 0;
 
 
     cancion1.play()
@@ -65,7 +58,7 @@ function iniciarCancion1() {
         .catch(function (error) {
 
             console.log(
-                "El navegador bloqueó la reproducción automática:",
+                "No se pudo iniciar canción 1:",
                 error
             );
 
@@ -75,17 +68,30 @@ function iniciarCancion1() {
 
 
 /* =========================================================
-   INICIAR CANCIÓN 2
+   DETENER CANCIÓN 1 COMPLETAMENTE
+========================================================= */
+
+function detenerCancion1() {
+
+    cancion1.pause();
+
+    cancion1.currentTime = 0;
+
+    musicaIniciada = false;
+
+}
+
+
+/* =========================================================
+   CANCIÓN 2
 ========================================================= */
 
 function iniciarCancion2() {
 
-    /* Apagar canción 1 */
+    /* Primero asegurarnos de que canción 1 esté apagada */
 
     cancion1.pause();
     cancion1.currentTime = 0;
-
-    musicaIniciada = false;
 
 
     /* Reiniciar canción 2 */
@@ -103,7 +109,7 @@ function iniciarCancion2() {
         .catch(function (error) {
 
             console.log(
-                "No se pudo reproducir la canción 2:",
+                "No se pudo iniciar canción 2:",
                 error
             );
 
@@ -113,7 +119,7 @@ function iniciarCancion2() {
 
 
 /* =========================================================
-   AL CARGAR LA PÁGINA
+   AL CARGAR
 ========================================================= */
 
 window.addEventListener("load", function () {
@@ -121,8 +127,7 @@ window.addEventListener("load", function () {
     crearParticulas();
 
     /*
-       Intentar reproducir automáticamente
-       la primera canción.
+       Intentar reproducir canción 1 automáticamente.
     */
 
     iniciarCancion1();
@@ -134,88 +139,93 @@ window.addEventListener("load", function () {
    CUALQUIER CLIC EN LA PRIMERA PÁGINA
 ========================================================= */
 
-document.addEventListener(
-    "click",
-    function (evento) {
+document.addEventListener("click", function (evento) {
 
-        /*
-           Si el clic fue en ENTRA AQUÍ,
-           NO iniciar canción 1 aquí.
+    /*
+       Si se hizo clic en ENTRA AQUÍ,
+       NO hacer nada aquí.
 
-           El botón se encargará de cambiar
-           a la canción 2.
-        */
+       El botón tiene su propio código.
+    */
 
-        if (evento.target.closest("#entrar")) {
-            return;
-        }
-
-
-        /*
-           Si estamos en la primera página,
-           cualquier otro clic inicia canción 1.
-        */
-
-        if (
-            !inicio.classList.contains("oculto") &&
-            !principal.classList.contains("entrada")
-        ) {
-
-            iniciarCancion1();
-
-        }
-
-    },
-    {
-        capture: true
+    if (evento.target.closest("#entrar")) {
+        return;
     }
-);
+
+
+    /*
+       Si se hizo clic en VOLVER,
+       tampoco hacer nada aquí.
+    */
+
+    if (evento.target.closest("#volver")) {
+        return;
+    }
+
+
+    /*
+       Solo activar canción 1 cuando
+       estamos en la primera pantalla.
+    */
+
+    if (!inicio.classList.contains("oculto")) {
+
+        iniciarCancion1();
+
+    }
+
+});
 
 
 /* =========================================================
    ENTRAR A LA SEGUNDA PANTALLA
 ========================================================= */
 
-entrar.addEventListener("click", function () {
+entrar.addEventListener("click", function (evento) {
 
     /*
-       PRIMERO apagamos completamente
-       la canción 1.
+       Evitar que otros eventos de clic
+       interfieran con este botón.
     */
 
+    evento.stopPropagation();
+
+
+    /* =====================================================
+       DETENER COMPLETAMENTE CANCIÓN 1
+    ===================================================== */
+
     cancion1.pause();
+
     cancion1.currentTime = 0;
 
     musicaIniciada = false;
 
 
-    /*
-       Preparar canción 2.
-    */
+    /* =====================================================
+       DETENER Y REINICIAR CANCIÓN 2
+    ===================================================== */
 
     cancion2.pause();
+
     cancion2.currentTime = 0;
 
 
-    /*
-       Animación de salida.
-    */
+    /* =====================================================
+       ANIMACIÓN DE SALIDA
+    ===================================================== */
 
     inicio.classList.add("salida");
 
 
     setTimeout(function () {
 
-        /*
-           Ocultar primera pantalla.
-        */
+        /* Ocultar inicio */
 
         inicio.classList.add("oculto");
 
 
-        /*
-           Mostrar segunda pantalla.
-        */
+        /* Mostrar principal */
 
         principal.classList.remove("oculto");
 
@@ -224,9 +234,9 @@ entrar.addEventListener("click", function () {
         principal.classList.add("entrada");
 
 
-        /*
-           Ahora sí comienza canción 2.
-        */
+        /* =================================================
+           AHORA COMIENZA SOLO LA CANCIÓN 2
+        ================================================= */
 
         cancion2.play()
             .then(function () {
@@ -237,16 +247,14 @@ entrar.addEventListener("click", function () {
             .catch(function (error) {
 
                 console.log(
-                    "No se pudo reproducir la canción 2:",
+                    "No se pudo reproducir canción 2:",
                     error
                 );
 
             });
 
 
-        /*
-           Crear partículas.
-        */
+        /* Crear partículas */
 
         crearParticulas();
 
@@ -256,42 +264,46 @@ entrar.addEventListener("click", function () {
 
 
 /* =========================================================
-   VOLVER A LA PANTALLA INICIAL
+   VOLVER A LA PRIMERA PANTALLA
 ========================================================= */
 
-volver.addEventListener("click", function () {
+volver.addEventListener("click", function (evento) {
 
     /*
-       PRIMERO apagamos completamente
-       la canción 2.
+       Evitar que el clic global interfiera.
     */
 
+    evento.stopPropagation();
+
+
+    /* =====================================================
+       DETENER COMPLETAMENTE CANCIÓN 2
+    ===================================================== */
+
     cancion2.pause();
+
     cancion2.currentTime = 0;
 
 
-    /*
-       También asegurarnos de que
-       la canción 1 esté detenida antes
-       de volver a reproducirla.
-    */
+    /* =====================================================
+       DETENER CANCIÓN 1 ANTES DE VOLVER A INICIARLA
+    ===================================================== */
 
     cancion1.pause();
+
     cancion1.currentTime = 0;
 
 
-    /*
-       Animación de salida.
-    */
+    /* =====================================================
+       ANIMACIÓN
+    ===================================================== */
 
     principal.classList.add("salida");
 
 
     setTimeout(function () {
 
-        /*
-           Ocultar segunda pantalla.
-        */
+        /* Ocultar principal */
 
         principal.classList.add("oculto");
 
@@ -300,9 +312,7 @@ volver.addEventListener("click", function () {
         principal.classList.remove("salida");
 
 
-        /*
-           Mostrar primera pantalla.
-        */
+        /* Mostrar inicio */
 
         inicio.classList.remove("oculto");
 
@@ -311,10 +321,11 @@ volver.addEventListener("click", function () {
         inicio.classList.add("entrada-inicio");
 
 
-        /*
-           Empezar nuevamente
-           la canción 1 desde el principio.
-        */
+        /* =================================================
+           VOLVER A COMENZAR CANCIÓN 1 DESDE EL PRINCIPIO
+        ================================================= */
+
+        cancion1.currentTime = 0;
 
         cancion1.play()
             .then(function () {
@@ -322,7 +333,7 @@ volver.addEventListener("click", function () {
                 musicaIniciada = true;
 
                 console.log(
-                    "🎵 Canción 1 reiniciada desde el principio"
+                    "🎵 Canción 1 reiniciada"
                 );
 
             })
@@ -331,7 +342,7 @@ volver.addEventListener("click", function () {
                 musicaIniciada = false;
 
                 console.log(
-                    "No se pudo reproducir la canción 1:",
+                    "No se pudo reproducir canción 1:",
                     error
                 );
 
@@ -465,5 +476,7 @@ function crearParticulas() {
     }
 
 }
+
+
 
 
