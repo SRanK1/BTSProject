@@ -1,3 +1,4 @@
+
 /* =========================================================
    ELEMENTOS
 ========================================================= */
@@ -28,8 +29,7 @@ cancion2.volume = 0.55;
 
 
 /* =========================================================
-   INICIAR MÚSICA CON CUALQUIER INTERACCIÓN
-   PC + CELULAR
+   INICIAR CANCIÓN 1 CON CUALQUIER INTERACCIÓN
 ========================================================= */
 
 let musicaIniciada = false;
@@ -40,52 +40,60 @@ function activarMusica() {
         return;
     }
 
-    musicaIniciada = true;
-
-    cancion1.load();
-
     cancion1.play()
         .then(function () {
+
+            musicaIniciada = true;
 
             console.log("🎵 Canción 1 iniciada");
 
         })
         .catch(function (error) {
 
-            musicaIniciada = false;
-
             console.log(
-                "No se pudo reproducir la canción:",
+                "No se pudo reproducir la canción 1 todavía:",
                 error
             );
 
         });
+
 }
 
 
 /* =========================================================
-   PC
+   INTENTO AUTOMÁTICO AL CARGAR
+========================================================= */
+
+window.addEventListener("load", function () {
+
+    crearParticulas();
+
+    activarMusica();
+
+});
+
+
+/* =========================================================
+   CUALQUIER CLIC EN LA PÁGINA
 ========================================================= */
 
 document.addEventListener(
-    "pointerdown",
+    "click",
     activarMusica,
     {
-        once: true,
         capture: true
     }
 );
 
 
 /* =========================================================
-   CELULAR
+   CUALQUIER TOQUE EN CELULAR
 ========================================================= */
 
 document.addEventListener(
     "touchstart",
     activarMusica,
     {
-        once: true,
         capture: true,
         passive: true
     }
@@ -98,18 +106,26 @@ document.addEventListener(
 
 entrar.addEventListener("click", function () {
 
-    /* Detener canción 1 */
+    /* =====================================================
+       Detener canción 1
+    ===================================================== */
 
     cancion1.pause();
     cancion1.currentTime = 0;
 
+    musicaIniciada = false;
 
-    /* Preparar canción 2 */
+
+    /* =====================================================
+       Preparar canción 2
+    ===================================================== */
 
     cancion2.currentTime = 0;
 
 
-    /* Animación de salida */
+    /* =====================================================
+       Animación de salida
+    ===================================================== */
 
     inicio.classList.add("salida");
 
@@ -130,7 +146,9 @@ entrar.addEventListener("click", function () {
         principal.classList.add("entrada");
 
 
-        /* Reproducir canción 2 */
+        /* =================================================
+           Reproducir canción 2
+        ================================================= */
 
         cancion2.play()
             .then(function () {
@@ -163,19 +181,25 @@ entrar.addEventListener("click", function () {
 
 volver.addEventListener("click", function () {
 
-    /* Detener canción 2 */
+    /* =====================================================
+       Detener canción 2
+    ===================================================== */
 
     cancion2.pause();
 
     cancion2.currentTime = 0;
 
 
-    /* Preparar canción 1 */
+    /* =====================================================
+       Preparar canción 1
+    ===================================================== */
 
     cancion1.currentTime = 0;
 
 
-    /* Animación de salida */
+    /* =====================================================
+       Animación de salida
+    ===================================================== */
 
     principal.classList.add("salida");
 
@@ -200,15 +224,21 @@ volver.addEventListener("click", function () {
         inicio.classList.add("entrada-inicio");
 
 
-        /* Reproducir canción 1 */
+        /* =================================================
+           Reproducir canción 1
+        ================================================= */
 
         cancion1.play()
             .then(function () {
+
+                musicaIniciada = true;
 
                 console.log("🎵 Canción 1 reiniciada");
 
             })
             .catch(function (error) {
+
+                musicaIniciada = false;
 
                 console.log(
                     "No se pudo reproducir la canción 1:",
@@ -346,13 +376,3 @@ function crearParticulas() {
 
 }
 
-
-/* =========================================================
-   CARGAR PÁGINA
-========================================================= */
-
-window.addEventListener("load", function () {
-
-    crearParticulas();
-
-});
